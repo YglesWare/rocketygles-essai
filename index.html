@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!-- Sécurité : seulement les fichiers du jeu, aucun script écrit dans la page (le chargement passe par js/boot.js) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RocketYgles essai</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#2a1b3d">
+</head>
+<body>
+
+<!-- Le jardin de Papi entre deux vols (mode Facile) : la rue des bâtiments, l'atelier en tête (js/hangar.js) -->
+<section class="screen street" id="sHangar" hidden>
+  <div class="topbar">
+    <div class="purse"><i class="coin"></i><b class="num" id="hGold">0</b></div>
+    <div class="purse" id="hStock" hidden><span class="stock" id="hPartsW" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="#ffd23f" stroke="#2a1b3d" stroke-width="2.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="4" fill="#5f8f74" stroke="#2a1b3d" stroke-width="2"/></svg><b class="num" id="hParts">0</b></span><span class="stock" id="hIdeasW" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z" fill="#fff3b0" stroke="#2a1b3d" stroke-width="2.2"/><rect x="8.5" y="18" width="7" height="3.5" rx="1.2" fill="#c9cfdc" stroke="#2a1b3d" stroke-width="2"/></svg><b class="num" id="hIdeas">0</b></span></div>
+    <div class="glass chip push" id="hRecChip" role="img" aria-label="Record"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21 V3" stroke="#2a1b3d" stroke-width="2.6" stroke-linecap="round"/><path d="M7 4 H19 L16 8.5 L19 13 H7z" fill="#ff4f81" stroke="#2a1b3d" stroke-width="2.2" stroke-linejoin="round"/></svg><b class="num" id="hRecord">0 m</b></div>
+  </div>
+  <h1 class="title" id="hTitle"><span>LE JARDIN DE PAPI</span></h1>
+  <p class="glass hintchip hhint" id="hHint" role="status" aria-live="polite"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 v11 l-2-2 a2 2 0 0 0-3 3 l5 5 h8 l2-7 v-4 a2 2 0 0 0-4 0 v-1 a2 2 0 0 0-4 0 v-5 a2 2 0 0 0-4 0z" fill="#ffe0c4" stroke="#2a1b3d" stroke-width="2" stroke-linejoin="round"/></svg><span id="hHintTxt"></span></p>
+  <div class="streetbox" id="hStreet"><div class="streetin" id="hStreetIn"><canvas id="hCanvas"></canvas><div id="hMarks"></div></div></div>
+  <div class="hdots" id="hDots"></div>
+  <button class="candy go launch" id="hGo" type="button"><svg width="22" height="24" viewBox="0 0 22 24" aria-hidden="true"><path d="M3 2 L20 12 L3 22z" fill="#2a1b3d"/></svg>LANCER</button>
+  <div class="dim" id="hDim" hidden></div>
+  <div class="glass sheet bsheet" id="hSheet" hidden role="dialog" aria-labelledby="hSName">
+    <div class="shead"><b id="hSName"></b><span class="pips" id="hSPips"></span><button class="xbtn" id="hSClose" type="button" aria-label="Fermer"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2 L12 12 M12 2 L2 12" stroke="#2a1b3d" stroke-width="3" stroke-linecap="round"/></svg></button></div>
+    <div class="sbody" id="hSBody"></div>
+    <button class="candy white" id="hSBuy" type="button">AMÉLIORER</button>
+  </div>
+</section>
+
+<!-- Le vol : la scène PixiJS, et l'interface par-dessus -->
+<section class="screen" id="sFlight" hidden>
+  <div id="stage"></div>
+  <div class="topbar" id="fTop">
+    <button class="glass round" id="fBack" type="button" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M13 3 L6 10 L13 17" fill="none" stroke="#2a1b3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="glass chip"><i class="coin"></i><b class="num" id="fGain">+0</b></div>
+    <div class="glass chip"><b class="num" id="fDist">0 m</b></div>
+    <div class="glass chip push" role="img" aria-label="Record"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21 V3" stroke="#2a1b3d" stroke-width="2.6" stroke-linecap="round"/><path d="M7 4 H19 L16 8.5 L19 13 H7z" fill="#ff4f81" stroke="#2a1b3d" stroke-width="2.2" stroke-linejoin="round"/></svg><b class="num" id="fRecord">0 m</b></div>
+  </div>
+  <div id="fIntro">
+    <h1 class="title" style="top:calc(84px + var(--sat))"><span id="fTitle">VOL N° 1</span></h1>
+    <p class="tag dark" id="fGoal" style="top:calc(152px + var(--sat))">Objectif</p>
+  </div>
+  <p class="glass hintchip" id="fHint"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 11 H19 M3 11 L9 5 M3 11 L9 17" fill="none" stroke="#2a1b3d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Tire l'élastique, puis lâche</p>
+  <div class="papi" id="papi" hidden>
+    <img src="img/papi.png" alt="Papi Yglou">
+    <p class="glass" id="papiTxt" role="status" aria-live="polite"></p>
+  </div>
+  <div class="glass gauge" id="fPull">
+    <div class="glabel"><span>Force de l'élastique</span><b class="num" id="fPullN">1 / 5</b></div>
+    <div class="bar"><i id="fPullBar" style="width:0%"></i></div>
+  </div>
+  <div class="pad" id="fPad" hidden>
+    <button class="candy padbtn" id="bUp" type="button" aria-label="Lever le nez"><svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><path d="M5 18 L14 8 L23 18" fill="none" stroke="#2a1b3d" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="candy padbtn" id="bDown" type="button" aria-label="Baisser le nez"><svg width="30" height="30" viewBox="0 0 28 28" aria-hidden="true"><path d="M5 10 L14 20 L23 10" fill="none" stroke="#2a1b3d" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="glass endcard" id="fEnd" hidden role="dialog" aria-label="Fin du vol">
+    <b class="big num" id="eDist">0 m</b>
+    <p class="egold"><i class="coin"></i><b class="num" id="eGold">+0</b></p>
+    <p class="muted" id="eCoins"></p>
+    <p class="rec" id="eRec" hidden>Nouveau record !</p>
+    <p class="muted" id="eStuck" hidden>L'avion n'a pas passé le tremplin : tire plus fort sur l'élastique !</p>
+    <div class="row2">
+      <button class="candy white" id="eHangar" type="button">L'atelier</button>
+      <button class="candy go" id="eAgain" type="button">Relancer</button>
+    </div>
+  </div>
+  <p class="fps" id="fps" hidden></p>
+</section>
+
+<script src="js/oldwv.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>
